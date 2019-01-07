@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import {ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import {inject, observer } from 'mobx-react';
+import RoomStore from '../stores/room-store';
+
 
 import '../css/style.css';
 
-export default class Input extends Component {
+ export default @inject ('RoomStore') @observer class Input extends Component {
   constructor(props) {
     super(props);
 
@@ -19,17 +22,21 @@ export default class Input extends Component {
     }));
   }
 
+  setSquare(){
+
+  }
+
 
   render() {
     return (
       <div className="Input">
        <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
           <DropdownToggle caret>
-            shapes
+            Shapes
           </DropdownToggle >
           <DropdownMenu className="p-0" tag="div">
-            <DropdownItem className="px-3 py-2 btn-li" tag="li" >Settings</DropdownItem>
-            <DropdownItem className="px-3 py-2 btn-li" tag="li" >Logout</DropdownItem>
+            <DropdownItem tag="li" onClick={this.setShape("square")}>Square</DropdownItem>
+            <DropdownItem tag="li" >Circular</DropdownItem>
           </DropdownMenu>
         </ButtonDropdown>
         
