@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import {ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import {ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Row, Col, Label, Input } from 'reactstrap';
 import {inject, observer } from 'mobx-react';
-import RoomStore from '../stores/room-store';
+
 
 
 import '../css/style.css';
 
- export default @inject ('RoomStore') @observer class Input extends Component {
+@inject ("robotStore") @observer class InputComp extends Component {
   constructor(props) {
     super(props);
 
@@ -22,26 +22,49 @@ import '../css/style.css';
     }));
   }
 
-  setSquare(){
-
+  setShape(shape){
+    this.props.robotStore.setShape(shape);
+  
   }
 
 
   render() {
+    const store= this.props.robotStore;
     return (
       <div className="Input">
-       <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+      <Row>
+      <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
           <DropdownToggle caret>
             Shapes
           </DropdownToggle >
           <DropdownMenu className="p-0" tag="div">
-            <DropdownItem tag="li" onClick={this.setShape("square")}>Square</DropdownItem>
-            <DropdownItem tag="li" >Circular</DropdownItem>
+            <DropdownItem tag="li" onClick={()=>this.setShape("square")}>Square</DropdownItem>
+            <DropdownItem tag="li" onClick={()=>this.setShape("circular")}>Circular</DropdownItem>
           </DropdownMenu>
         </ButtonDropdown>
+        </Row>
+        <Row>
+         {store.roomShape ? 
+          store.roomShape === "square" ? 
+           <Label for="r-number">Length </Label> 
+          : 
+           <Label for="r-number">Radius</Label>
+          :
+          <Label for="r-number">Please choose room shape.</Label>
+          }
+          
+          <Input type="r-number" name="r-number" id="r-number" placeholder="Please enter a positive integer." />
+        
+       
+        </Row>
+       
+        
+         
         
       </div>
     );
   }
 }
+
+export default InputComp;
 

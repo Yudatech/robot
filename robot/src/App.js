@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
+import {Provider } from 'mobx-react';
+
 import './App.css';
 import {Container, Row, Col, Form } from 'reactstrap';
-import Input from './components/Input';
-import RoomStore from './stores/room-store';
+import InputComp from './components/Input';
+import RobotStore from './stores/RobotStore';
+
+const robotStore = new RobotStore();
 
 class App extends Component {
   render() {
     return (
+      <Provider robotStore = {robotStore}>
+     
       <div className="App">
         <Container fluid={true} className="robot">
         
@@ -17,7 +23,7 @@ class App extends Component {
 
               <Form> 
                 <p>Drow your own room by choosing shapes!</p>
-                <Input/>
+                <InputComp/>
                 
               </Form>
             </Col>
@@ -29,6 +35,7 @@ class App extends Component {
         </Container>
       
       </div>
+      </Provider>
     );
   }
 }
