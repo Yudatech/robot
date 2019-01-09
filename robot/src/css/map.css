@@ -1,0 +1,40 @@
+.cell{
+  min-width: 1px;
+  min-height: 1px;
+}
+
+.cell .robot{
+  color:orange;
+}
+
+.cell.black{
+  background-color: lightgray;
+}
+
+/* .cell.black .robot{
+  color:white;
+} */
+
+.cell.white{
+  background-color: #f8f8f8;
+}
+
+.map{
+  width:500px;
+}
+
+.map .row{
+   margin: 0;
+}
+
+.map .robot.W{
+  transform: rotate(-90deg);
+}
+
+.map .robot.S{
+  transform: rotate(180deg);
+}
+
+.map .robot.E{
+  transform: rotate(90deg);
+}

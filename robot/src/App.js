@@ -5,6 +5,7 @@ import './App.css';
 import {Container, Row, Col, Form } from 'reactstrap';
 import InputComp from './components/Input';
 import RobotStore from './stores/RobotStore';
+import Map from './components/Map';
 
 const robotStore = new RobotStore();
 
@@ -28,7 +29,7 @@ class App extends Component {
               </Form>
             </Col>
             <Col xs="12" md="8">
-            
+              <Map></Map>
             </Col>
           
             </Row>
