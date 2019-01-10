@@ -1,87 +1,66 @@
 
 import {observable, action} from 'mobx';
-import { exists } from 'fs';
-
-export default class RobotStore {
-  //room info
-  @observable roomShape="";
-  @observable r = ""; //length of sides of squares or radius of circulars
-  @observable tooBigRoom = false;
+import {roomStore} from './RoomStore'; 
+ class RobotStore {
     //moves
   @observable coordinates = [0,0];
   @observable direction = 0;
   @observable currentMove = "";
+  @observable isEnglish= true;
   @observable commandsStep=[];
 
-  @action setShape(shape){
-    switch (shape){
-      case "square":
-        this.roomShape = "square";
-        break;
-      case "circular":
-        this.roomShape = "circular";
-        break;
-      default:
-      this.roomShape = "square";
-    }
-    
-  }
-
-  @action setR(num){
-    if(num>0){
-      this.r = num;
-    }else{
-      this.r = 0;
-    }
-  }
-
-  @action checkRoomSize(tooBig){
-    if(tooBig){
-      this.tooBigRoom=true;
-    }else{
-      this.tooBigRoom= false;
-    }
+  @action toggleLanguages(){
+    this.isEnglish= !this.isEnglish;
   }
 
   @action setStartPosition(x,y){
     this.coordinates=[x,y];
-  
   }
 
- 
-
   @action turnTo(direc){
-    
     switch(direc){
       case "l":
+      case "v":
         this.direction = (this.direction + 1) % 4;
+        this.isEnglish ?
         this.commandsStep.push({
           command: "L",
+          result: true
+        })
+        :
+        this.commandsStep.push({
+          command: "V",
           result: true
         });
         break;
       case "r":
+      case "h":
         this.direction = (this.direction + 3) % 4;
+        this.isEnglish ?
         this.commandsStep.push({
           command: "R",
+          result: true
+        })
+        :
+        this.commandsStep.push({
+          command: "H",
           result: true
         });
         break;
       case "f":
+      case "g":
         this.moveForward();
         break;
       default:
         break;
     }
-  
   }
 
   @action moveForward(){
-    
       const pos_x= this.coordinates[0];
       const pos_y = this.coordinates[1];
       const direct = this.direction;
-      const r = this.r;
+      const r = roomStore.r;
   
       let newPos = {
         x: pos_x,
@@ -90,50 +69,59 @@ export default class RobotStore {
   
       switch(direct){
         case 0: 
-        newPos = {
+          newPos = {
             x: pos_x,
             y: pos_y + 1
           };
           break;
-  
-          case 1: 
+        case 1: 
           newPos = {
             x: pos_x -1,
             y: pos_y
           };
           break;
-  
-          case 2: 
+        case 2: 
           newPos = {
             x: pos_x,
             y: pos_y - 1
           };
           break;
-  
-          case 3: 
+        case 3: 
           newPos = {
             x: pos_x +1,
             y: pos_y
           };
           break;
-  
-          default:
+        default:
           break;
       }
-
-      if(this.roomShape ==="circular"){
-        if((newPos.x*newPos.x+newPos.y*newPos.y)>(r*r*1.1)){
+      if(roomStore.roomShape ==="circular"){
+        
+        if((newPos.x*newPos.x+newPos.y*newPos.y)>(r*r)){
+          
           this.coordinates= [pos_x, pos_y];
+          this.isEnglish ?
           this.commandsStep.push({
             command: "F",
+            result: false
+          })
+          :
+          this.commandsStep.push({
+            command: "G",
             result: false
           });
         }else{
           this.coordinates = [newPos.x, newPos.y];
-          this.commandsStep.push({
-            command: "F",
-            result: true
-          });
+          this.isEnglish ?
+        this.commandsStep.push({
+          command: "F",
+          result: true
+        })
+        :
+        this.commandsStep.push({
+          command: "G",
+          result: true
+        });
         }
       }else{
         if(newPos.x>=r || newPos.y>=r || newPos.x<0 || newPos.y<0){
@@ -151,8 +139,7 @@ export default class RobotStore {
         }
       }
 
-  
-      
-    
   }
 }
+
+export const robotStore = new RobotStore();

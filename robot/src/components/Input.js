@@ -1,46 +1,58 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import {ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Row, Col, Label, Input , Button, ButtonGroup, Form} from 'reactstrap';
 import {inject, observer } from 'mobx-react';
-
-
-
-import '../css/style.css';
-
-
-
-@inject ("robotStore") @observer class InputComp extends Component {
+import {Row, Col, Label, Input , Button, ButtonGroup} from 'reactstrap';
+import {FaArrowRight, FaArrowUp, FaArrowLeft} from 'react-icons/fa';
+@inject ("robotStore", "roomStore") @observer class InputComp extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
     this.state = {
-      dropdownOpen: false,
       inputChecked: true,
-      isEnglish: true,
+      commandChecked: true,
+      cmdInput:'',
     };
   }
 
-  toggle() {
-    this.setState(prevState => ({
-      dropdownOpen: !prevState.dropdownOpen
-    }));
-  }
-
-  toggleLanguages(){
-    this.setState(prevState => ({
-      isEnglish: !prevState.isEnglish
-    }));
-  }
-
   setShape(shape){
-    this.props.robotStore.setShape(shape);
-  
+    this.props.roomStore.setShape(shape);
   }
 
+  handleCmdChange=(e)=>{
+    let ref=[];
+    //input English commands only valid for 'l'/'L', 'r'/'R', 'f'/'F'
+    //input Swedish commands only valid for 'v'/'V', 'h'/'H', 'g'/'G'
+    this.props.robotStore.isEnglish? ref=['l', 'r', 'f'] : ref = ['v','h','g'];
+      let val = e.target.value;
+      this.setState(() => ({
+        cmdInput: val
+      }), () => {
+        let cmdArray = this.state.cmdInput.toLowerCase().split('');
+
+        let uniqCmd = cmdArray.filter((item, pos)=>{
+          return cmdArray.indexOf(item) ===pos
+        });
+        uniqCmd = uniqCmd.filter((item)=>{
+          return !ref.includes(item);
+        })
+        
+        if (uniqCmd.length > 0) {
+          this.setState(() => ({
+            commandChecked: false,
+          }));
+          return;
+        } else {
+          this.setState(() => ({
+            commandChecked: true,
+          }));
+        }
+      });
+}
+
+
+  
 
   renderMap(){
-
     // set length or radius
     var val =  ReactDOM.findDOMNode(this.refs.rField).value;
   
@@ -49,7 +61,7 @@ import '../css/style.css';
         this.setState(() => ({
           inputChecked: true
         }));
-        this.props.robotStore.setR(val/1);
+        this.props.roomStore.setR(val/1);
         
       }else{
         this.setState(() => ({
@@ -73,74 +85,58 @@ import '../css/style.css';
 
     //set commands
 
-    let commandString = ReactDOM.findDOMNode(this.refs.commandsField).value.toLowerCase();
-    let commandSteps = commandString.split('');
+    let cmdArray = this.state.cmdInput.toLowerCase().split('');
 
-    if(this.state.isEnglish){
+    if(cmdArray.length>0){
       let interval =  setInterval(()=>{
-        if(commandSteps.length === 0){
+        if(cmdArray.length === 0){
           clearInterval(interval);
           return;
-        }
-
-        let c = commandSteps.shift();
-        if(c!=="f" && c!=="l" && c!=="r"){
-          console.log("check your command!");
-          return;
         }else{
-          this.props.robotStore.turnTo(c);
+          this.props.robotStore.turnTo(cmdArray.shift());
         }
+      
       }, 500);
-      
-      // commandSteps.forEach(c=>{
-      //   if(c!=="f" && c!=="l" && c!=="r"){
-      //     console.log("check your command!");
-      //     return;
-      //   }else{
-          
-      //     ()=>this.props.robotStore.turnTo(c),500);
-      //   }
-      // })
-      
     }
+      
+      
+ 
+      
+    
   }
 
 
 
 
   render() {
-    const store= this.props.robotStore;
+    const roomStore= this.props.roomStore;
+    const robotStore = this.props.robotStore;
     return (
       <div className="Input">
 
-      {this.state.isEnglish ? 
-      <div>
-       <Button color="primary" onClick={()=>this.toggleLanguages()}>English</Button>
-    
+     
+      
+       
        <Row>
-      <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-          <DropdownToggle caret>
-            Shapes
-          </DropdownToggle >
-          <DropdownMenu className="p-0" tag="div">
-            <DropdownItem tag="li" onClick={()=>this.setShape("square")}>Square</DropdownItem>
-            <DropdownItem tag="li" onClick={()=>this.setShape("circular")}>Circular</DropdownItem>
-          </DropdownMenu>
-        </ButtonDropdown>
+        <p>Please choose your room shape.</p>
+       <ButtonGroup>
+          <Button onClick={()=>this.setShape("square")}>Square</Button>
+          <Button onClick={()=>this.setShape("circular")}>Circular</Button>
+       </ButtonGroup>
+      
         </Row>
         <Row>
-         {store.roomShape ? 
-          store.roomShape === "square" ? 
-           <Label for="r-number">Length </Label> 
+         {roomStore.roomShape ? 
+          roomStore.roomShape === "square" ? 
+           <Label for="r-number">Set your square room with a length of:</Label> 
           : 
-           <Label for="r-number">Radius</Label>
+           <Label for="r-number">Set your circular room with a radius of:</Label>
           :
-          <Label for="r-number">Please choose your room shape.</Label>
+          <Label for="r-number">Set your room size:</Label>
           }
           
           <Input ref="rField" type="number" name="r-number" id="r-number" placeholder="Please enter a positive integer."  />
          
-          
           {this.state.inputChecked ? <p></p> : <p className="text-danger">Positive integers only!</p>}
 
           <Label for="xField">Configure start position:</Label> 
@@ -154,73 +150,36 @@ import '../css/style.css';
           </Col> 
           </Row> 
             
-          <Label for="commandsField">The robot moves in the room by interpreting a string of commands:</Label>
+         
+
+          {this.props.robotStore.isEnglish ? 
+          <div>
+             <Label for="commandsField">The robot moves in the room by interpreting a string of commands:</Label>
+            <Button color="primary" onClick={()=>this.props.robotStore.toggleLanguages()}>English</Button>
+            <p>L - Turn left R - Turn right F - Move forward</p>
+          <Input ref="commandsField" type="text" name="commandsField" id="commandsField" placeholder="Example:  LFFRFRFRFF " value={this.state.cmdInput} onChange={this.handleCmdChange}  />
+          </div>
+              :
+          <div>
+            <Label for="commandsFieldSV">The robot moves in the room by interpreting a string of commands:</Label>
+            <Button color="primary" onClick={()=>this.props.robotStore.toggleLanguages()}>Svenska</Button>
+            <p>V - Turn left H - Turn right G - Move forward</p>
+          <Input ref="commandsFieldSV" type="text" name="commandsFieldSV" id="commandsFieldSV" placeholder="Example:  VGGHGHGHGG " value={this.state.cmdInput} onChange={this.handleCmdChange} />
+          </div>
+          }
+           {this.state.commandChecked ? <p></p> : <p className="text-danger">Command is not valid.</p>}
           
-          <p>L - Turn left R - Turn right F - Move forward</p>
-          <Input ref="commandsField" type="text" name="commandsField" id="commandsField" placeholder="Example:  LFFRFRFRFF "  />
-       
         </Row>
         <Button onClick={()=>this.renderMap()}>Start</Button>
      
           <p>You can also control your robot by steps</p>
          
-    <ButtonGroup>
-        <Button onClick={()=>store.turnTo("l")}>L</Button>
-        <Button onClick={()=>store.moveForward()}>F</Button>
-        <Button onClick={()=>store.turnTo("r")}>R</Button>
+      <ButtonGroup>
+        <Button onClick={()=>robotStore.turnTo("l")}><FaArrowLeft /></Button>
+        <Button onClick={()=>robotStore.moveForward()}><FaArrowUp /></Button>
+        <Button onClick={()=>robotStore.turnTo("r")}><FaArrowRight /></Button>
       </ButtonGroup>
-
-     </div>
-       :
-       <div>
-       
-       <Button color="primary" onClick={()=>this.toggleLanguages()}>Svenska</Button>
-       <Row>
-      <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-          <DropdownToggle caret>
-            Form
-          </DropdownToggle >
-          <DropdownMenu className="p-0" tag="div">
-            <DropdownItem tag="li" onClick={()=>this.setShape("square")}>Fyrkant</DropdownItem>
-            <DropdownItem tag="li" onClick={()=>this.setShape("circular")}>Cirkulär</DropdownItem>
-          </DropdownMenu>
-        </ButtonDropdown>
-        </Row>
-
-        <Row>
-         {store.roomShape ? 
-          store.roomShape === "square" ? 
-           <Label for="r-number">Längd </Label> 
-          : 
-           <Label for="r-number">Radiu</Label>
-          :
-          <Label for="r-number">Välj din rumsform.</Label>
-          }
-          
-          <Input ref="rField" type="number" name="r-number" id="r-number" placeholder="Please enter a positive integer and press Enter key." onKeyDown ={(e)=>this.handleNewRKeyDown(e)} />
-          {this.state.inputChecked ? <p></p> : <p className="text-danger">Positiva heltal, tack!</p>}
-          
-          <Label for="commandsField">Roboten rör sig i rummet genom att tolka en rad kommandon:</Label>
-          <p>V - Till vänster H - Till höger G - Gå framåt</p>
-          <Input ref="commandsField" type="text" name="commandsField" id="commandsField" placeholder="Example: VGGHGHGHGG " onKeyDown ={(e)=>this.handleNewCommandsKeyDown(e)} />
-       
-        </Row>
-          <p>
-          Du kan också styra din robot med steg
-          </p>
-    <ButtonGroup>
-        <Button>V</Button>
-        <Button>G</Button>
-        <Button>H</Button>
-      </ButtonGroup>
-        
-       </div>
-      }
-  
-       
-        
-         
-        
+      
       </div>
     );
   }

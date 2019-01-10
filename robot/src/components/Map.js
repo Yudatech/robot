@@ -5,23 +5,22 @@ import {FaAndroid} from 'react-icons/fa';
 import {toDirection} from '../utils';
 import {toJS} from 'mobx';
 
-@inject ("robotStore") @observer class Map extends Component {
- 
- 
 
+@inject ("robotStore", "roomStore") @observer class Map extends Component {
+ 
   createMap = ()=>{
     const pos_x= toJS(this.props.robotStore.coordinates)[0];
     const pos_y = toJS(this.props.robotStore.coordinates)[1];
     const direct = toJS(this.props.robotStore.direction);
-    const shape = toJS(this.props.robotStore.roomShape);
+    const shape = toJS(this.props.roomStore.roomShape);
 
     let map = [];
 
-    if(!this.props.robotStore){
+    if(!this.props.roomStore){
       return <div>Empty</div>;
     }
 
-    const r = this.props.robotStore.r;
+    const r = this.props.roomStore.r;
 
     let cellWidth=0;
 
@@ -33,15 +32,13 @@ import {toJS} from 'mobx';
           return (<p  className="text-warning">Too big room! I'll not show you my map, but you can find my position here!</p>); 
         }
          for (let i = r; i>=-r; i--){
-          //j= r-1; j>-r; j--
            let row =[];
 
            for (let j= -r; j<=r; j++){
-            //i = -r+1; i<r; i++
              const color =i%2 === 0 ? (j%2 === 0 ? 'black' : 'white') : (j%2 === 0 ? 'white' : 'black');
              if(pos_x===j && pos_y===i){
               row.push(<div className={`cell ${color}`} style={{width: `${cellWidth}px`, height:`${cellWidth}px`}}  row={i} col={j} key={j}><FaAndroid style={{fontSize:`${cellWidth-4}px`, margin:0}} className={`${toDirection(direct)} robot`}/></div>);
-            }else if((i*i + j*j)>(r*r*1.1)){
+            }else if((i*i + j*j)>(r*r)){
             
           
               row.push(<div style={{width: `${cellWidth}px`, height:`${cellWidth}px`, backgroundColor:"white"}}  row={i} col={j} key={j}></div>);
