@@ -177,7 +177,7 @@ import {toJS} from 'mobx';
             }}>{s.command}</div>)
         })}
         </div>
-        <p>
+        <div style={{marginTop: "20px"}}>
           <FaAndroid
             style={{
             margin: '0px',
@@ -185,7 +185,7 @@ import {toJS} from 'mobx';
             color: "orange"
           }}
             className="robot"/>
-          My position: ({x}, {y}) {toDirection(this.props.robotStore.direction)}</p>
+          My position: ({x}, {y}) {toDirection(this.props.robotStore.direction)}</div>
       </div>
     );
   }
