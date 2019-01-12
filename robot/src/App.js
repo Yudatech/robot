@@ -15,7 +15,7 @@ class App extends Component {
       <Provider robotStore = {robotStore} roomStore={roomStore} >
       <div className="App">
         <Container fluid={true} className="robot">
-          <h1> Robot</h1>
+          <h1> Robot Go!</h1>
           <Row className="input-map-area"> 
             <Col xs="12" md="4">
                 <InputComp/>

@@ -1,0 +1,17 @@
+.Input {
+  margin-left: 50px;
+  width:100%;
+}
+
+.Input .btn.active{
+  background-color: lightseagreen !important;
+  border-color: lightseagreen !important;
+}
+
+.direc{
+  background-color: lightseagreen !important;
+  border-color: white;
+}
+
+
+

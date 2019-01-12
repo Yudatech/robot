@@ -4,7 +4,7 @@ import {observable, action} from 'mobx';
 
 
  class RoomStore {
-    @observable roomShape="";
+    @observable roomShape="square";
     @observable r = ""; //length of sides of squares or radius of circulars
 
     @action setShape(shape){

@@ -12,3 +12,7 @@ export function toDirection(num) {
       return "N";
   }
 }
+
+export function checkWithinRange(a, b, r){
+  return ((a*a+b*b)<=(r*r));
+}
