@@ -14,6 +14,9 @@ import {checkWithinRange} from '../utils';
 import {FaArrowRight, FaArrowUp, FaArrowLeft} from 'react-icons/fa';
 import '../css/input.css';
 
+/*
+* Summary.  Input class is used to generate a control panel for configurations and user actions 
+*/
 @inject("robotStore", "roomStore")@observer class InputComp extends Component {
   constructor(props) {
     super(props);
@@ -262,8 +265,7 @@ import '../css/input.css';
                 ? <p></p>
                 : <p className="text-danger">Command is not valid, only "v", "h", "g" and "V", "H", "G"</p>}
            
-            </div>
-}
+            </div>}
                 <Input
                   ref="commandsField"
                   type="text"
@@ -271,15 +273,12 @@ import '../css/input.css';
                   id="commandsField"
                   value={this.state.cmdInput}
                   onChange={this.handleCmdChange}/>
-
         </Row>
         <Row>
           <Button className="active" style={{marginTop: "20px", width:"30%", marginLeft:"35%"}} onClick={() => this.renderMap()}>Start</Button>
           </Row>
         
-
-        
-
+        {/* Button control not allowed when r is not set */}
         {this.props.roomStore.r ?  
         <div>
           <p className="float-left" style={{marginTop: "20px", marginLeft:"20px"}}>You can also control your robot by steps:</p>

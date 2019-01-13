@@ -6,6 +6,9 @@ import {toDirection} from '../utils';
 import {checkWithinRange} from '../utils';
 import {toJS} from 'mobx';
 
+/*
+* Summary.   Map class is used to generate map and robot icon according to postions and configurations in store 
+*/
 @inject("robotStore", "roomStore")@observer class Map extends Component {
 
   /*
@@ -19,26 +22,30 @@ import {toJS} from 'mobx';
     const pos_y = toJS(this.props.robotStore.coordinates)[1];
     const direct = toJS(this.props.robotStore.direction);
     const shape = toJS(this.props.roomStore.roomShape);
+    const r = this.props.roomStore.r;
 
+    let cellWidth = 0;
     let map = [];
 
+    //Don't generate map if store is not ready
     if (!this.props.roomStore) {
       return <div>Empty</div>;
     }
 
-    const r = this.props.roomStore.r;
-
-    let cellWidth = 0;
-
+    //Only do the rendering when r is set with a valid number
     if (r > 0) {
+      //When room shape is circular
       if (shape === "circular") {
         cellWidth = Math.floor(500 / (2 * r + 1));
 
+        //Control the maximiun rendering size. postion calculation still works
         if (cellWidth <= 20) {
           return (
             <p className="text-warning">Too big room! I'll not show you my map, but you can find my position here!</p>
           );
         }
+
+        //Rendering the map and robot
         for (let i = r; i >= -r; i--) {
           let row = [];
 
@@ -55,19 +62,24 @@ import {toJS} from 'mobx';
                 <div
                   className={`cell ${color}`}
                   style={{
-                  width: `${cellWidth}px`,
-                  height: `${cellWidth}px`
-                }}
+                    width: `${cellWidth}px`,
+                    height: `${cellWidth}px`
+                  }}
                   row={i}
                   col={j}
-                  key={j}><FaAndroid
-                  style={{
-                  fontSize: `${cellWidth - 4}px`,
-                  margin: 0
-                }}
-                  className={`${toDirection(direct)} robot`}/></div>
+                  key={j}>
+                  
+                 {/*Render robot*/}
+                  <FaAndroid 
+                    style={{
+                      fontSize: `${cellWidth - 4}px`,
+                      margin: 0
+                    }}
+                    className={`${toDirection(direct)} robot`}/>
+                </div>
               );
             } else if (checkWithinRange(i, j, r)) {
+              //Only render the cells posible to reach
               row.push(
                 <div
                   className={`cell ${color}`}
@@ -97,15 +109,20 @@ import {toJS} from 'mobx';
             <div className="row" key={i}>{row}</div>
           );
         }
-      } else {
-
+      } 
+      //when room shape is square
+      else {
+        //For UI rendering with a proper width
         cellWidth = Math.floor(500 / r);
 
+        //Control the maximiun rendering size. postion calculation still works
         if (cellWidth <= 20) {
           return (
             <p className="text-warning">Too big room! I'll not show you my map, but you can find my position here!</p>
           );
         }
+
+        //Render map
         for (let i = r - 1; i >= 0; i--) {
           let row = [];
 
@@ -118,6 +135,7 @@ import {toJS} from 'mobx';
                 ? 'white'
                 : 'black');
             if (pos_x === j && pos_y === i) {
+              //Render robot here
               row.push(
                 <div
                   className={`cell ${color}`}
@@ -154,6 +172,7 @@ import {toJS} from 'mobx';
         }
       }
 
+      //Return the map dom tree
       return map;
     }
   }
@@ -164,7 +183,6 @@ import {toJS} from 'mobx';
     const step = this.props.robotStore.commandsStep;
     const stuck = this.props.robotStore.amIstuck;
     return (
-
       <div className="map">
         {this.createMap()}
         {/* Robot will stuck at the edge if given command leads robot outside of the room, and commend step shows red */}
